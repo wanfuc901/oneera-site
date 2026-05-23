@@ -1,0 +1,27 @@
+{
+  "name": "ONE ERA",
+  "short_name": "ONE ERA",
+  "description": "ONE ERA — Khu đô thị kiểu mẫu thế hệ mới tại Thượng Đông, TP.HCM.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#0f172a",
+  "icons": [
+    {
+      "src": "/favicon.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "/favicon.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    },
+    {
+      "src": "/gg_search_logo.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any maskable"
+    }
+  ]
+}

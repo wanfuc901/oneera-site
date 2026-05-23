@@ -1,0 +1,5 @@
+# HTTrack Website Copier Cookie File
+# This file format is compatible with Netscape cookies
+www.congtykimoanh.vn	TRUE	/	FALSE	1999999999	form	0
+www.congtykimoanh.vn	TRUE	/	FALSE	1999999999	__RequestVerificationToken	r4nr6nWYgR1e3haOPG1F5Fbi_lzKVlYhwrC_fXeGYoppa-tn35-GFyxQu493MstDLo-av2pwOOcuoJq5EPxB0SdnZfrkgp2_G5cG5WRR7gk1
+

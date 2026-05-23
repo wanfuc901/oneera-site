@@ -1,0 +1,14 @@
+# HTTrack cache
+hts-cache/
+hts-log.txt
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+*.swp
+*~
+
+.vercel

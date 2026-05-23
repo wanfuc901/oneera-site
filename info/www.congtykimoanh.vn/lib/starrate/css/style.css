@@ -1,0 +1,32 @@
+@font-face{font-family:'starwarsjs';src:url('https://www.congtykimoanh.vn/lib/starrate/fonts/starwarsjs.eot');src:url('https://www.congtykimoanh.vn/lib/starrate/fonts/starwarsjs.eot#iefix') format('embedded-opentype'),url('https://www.congtykimoanh.vn/lib/starrate/fonts/starwarsjs.ttf') format('truetype'),url('https://www.congtykimoanh.vn/lib/starrate/fonts/starwarsjs.woff') format('woff'),url('https://www.congtykimoanh.vn/lib/starrate/fonts/starwarsjs.svg#starwarsjs') format('svg');font-weight:normal;font-style:normal;}.rate_star:before{content:"\e902";font-family:'starwarsjs'!important;font-style:normal;font-weight:normal;font-variant:normal;text-transform:none;line-height:1;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;}.rate_row{width:85px;}.rate_star{color:#cccccc;cursor:pointer;font-size:15px;padding:0!important;margin-right:2px!important;}.rate_star.checked{color:#F9D932;}.rate_star.over{color:#f01c25;}.rate_star.disable{cursor:not-allowed;pointer-events:none;}.submit_stars{padding:3px 14px;background:#801513;border:1px solid #801513;color:#ffffff;cursor:pointer;outline:none;font-size:16px;margin-top:5px;margin-left:30px;}.submit_stars:hover{background:#D41715;border:1px solid #D41715;}
+.rates{
+    float: right;
+    position: relative;
+    text-align: right;
+}
+.darates {
+    text-align: center;
+    border: 0;
+    bottom: 10px;
+    margin-bottom: 4px;
+}
+.darates .rate_star{font-size: 26px;}
+/*.darates #valore {position:unset!important;}*/
+#rate_row_cmd{
+	color:#555;
+	line-height:11px;
+	font-size:11px;
+	font-style:italic;
+	display:block;
+    text-align: center;
+}
+#valore{
+display: inline-block;
+    font-size: 16px;
+    bottom: -20px;
+    left: 36%;
+    color: #f01c25;
+}
+#valore b{
+	color:#f01c25;
+}
