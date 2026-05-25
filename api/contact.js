@@ -42,7 +42,7 @@ async function appendToSheet({ timestamp, name, phone, email, project, message }
 }
 
 /* ─── HTML email template ─────────────────────────────────────────────────── */
-function buildHtml({ name, phone, email, project, message, timestamp }) {
+function buildHtml({ name, phone, email, project, message, timestamp, sheetUrl }) {
 
   const emailRow = email
     ? `<a href="mailto:${escHtml(email)}" style="color:#1d4ed8;text-decoration:none;font-size:14px;">${escHtml(email)}</a>`
@@ -254,20 +254,21 @@ function buildHtml({ name, phone, email, project, message, timestamp }) {
               <table width="100%" cellpadding="0" cellspacing="0">
                 <tr>
                   <td style="vertical-align:middle;">
-                    <div style="font-size:12px;color:#64748b;margin-bottom:3px;">
-                      Liên hệ khách hàng qua
+                    <div style="font-size:11px;color:#94a3b8;margin-bottom:4px;
+                                text-transform:uppercase;letter-spacing:.8px;font-weight:600;">
+                      Danh sách leads
                     </div>
-                    <div style="font-size:15px;font-weight:700;color:#0f172a;">
-                      ${escHtml(phone)}
+                    <div style="font-size:13px;color:#475569;line-height:1.5;">
+                      Xem toàn bộ dữ liệu đăng ký<br>trong Google Sheets
                     </div>
                   </td>
                   <td align="right" style="vertical-align:middle;">
-                    <a href="tel:${phone.replace(/\s/g,'')}"
+                    <a href="${sheetUrl}"
                        style="display:inline-block;background:#0f172a;color:#C8A96E;
-                              font-size:13px;font-weight:700;padding:11px 24px;
+                              font-size:13px;font-weight:700;padding:11px 22px;
                               border-radius:7px;text-decoration:none;
                               letter-spacing:.2px;white-space:nowrap;">
-                      Gọi ngay
+                      Xem Google Sheet
                     </a>
                   </td>
                 </tr>
@@ -355,7 +356,8 @@ module.exports = async function handler(req, res) {
 
   const subject = `[Lead mới] ${name} · ${project || 'Chưa chọn dự án'} · ${phone}`;
 
-  const data = { name, phone, email, project, message, timestamp };
+  const sheetUrl = `https://docs.google.com/spreadsheets/d/${process.env.GOOGLE_SHEET_ID}/edit`;
+  const data = { name, phone, email, project, message, timestamp, sheetUrl };
 
   const [mailResult, sheetResult] = await Promise.allSettled([
     transporter.sendMail({
