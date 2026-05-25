@@ -619,6 +619,80 @@
       font-family:inherit;text-decoration:none;display:flex;align-items:center;
     }
     .mf-sec:hover{border-color:var(--gold);color:var(--gold)}
+
+    /* ══════════════════════════════
+       HAMBURGER + MOBILE DRAWER
+    ══════════════════════════════ */
+    .nav-hamburger{
+      display:none;margin-left:auto;
+      background:none;border:1px solid var(--border);
+      border-radius:8px;padding:7px 9px;cursor:pointer;
+      color:var(--text);align-items:center;justify-content:center;
+      transition:border-color .2s,color .2s;
+    }
+    .nav-hamburger:hover{border-color:var(--gold);color:var(--gold)}
+    @media(max-width:900px){.nav-hamburger{display:flex}}
+    .nav-drawer{
+      display:none;
+      position:fixed;top:64px;left:0;right:0;z-index:99;
+      background:rgba(15,23,42,.98);backdrop-filter:blur(16px);
+      border-bottom:1px solid var(--border);
+      flex-direction:column;overflow:hidden;
+      max-height:0;transition:max-height .35s var(--ease);
+    }
+    @media(max-width:900px){.nav-drawer{display:flex}}
+    .nav-drawer.open{max-height:400px}
+    .nav-drawer a{
+      padding:13px 5%;font-size:15px;font-weight:600;
+      color:var(--muted);border-bottom:1px solid var(--border);
+      transition:color .2s,background .2s;
+    }
+    .nav-drawer a:last-child{border-bottom:none}
+    .nav-drawer a:hover{color:var(--gold);background:rgba(200,169,110,.04)}
+    .nav-drawer .d-cta{
+      background:rgba(200,169,110,.08);color:var(--gold) !important;
+      font-weight:700;text-align:center;
+    }
+    .nav-drawer .d-cta:hover{background:rgba(200,169,110,.15) !important}
+
+    /* ══════════════════════════════
+       FLOATING CTA
+    ══════════════════════════════ */
+    .float-cta{
+      position:fixed;bottom:28px;right:24px;
+      z-index:500;display:flex;flex-direction:column;
+      align-items:center;gap:12px;
+    }
+    .float-btn{
+      width:54px;height:54px;border-radius:50%;
+      display:flex;align-items:center;justify-content:center;
+      box-shadow:0 4px 20px rgba(0,0,0,.45);
+      transition:transform .2s var(--ease),box-shadow .2s;
+      position:relative;text-decoration:none;
+    }
+    .float-btn:hover{transform:scale(1.1);box-shadow:0 8px 28px rgba(0,0,0,.55)}
+    .float-phone{background:var(--gold);color:var(--bg)}
+    .float-zalo{background:#0068ff;color:#fff}
+    .float-zalo::before{
+      content:'';position:absolute;inset:-4px;border-radius:50%;
+      border:2px solid #0068ff;
+      animation:fpulse 2.4s ease-out infinite;opacity:0;
+    }
+    @keyframes fpulse{
+      0%{transform:scale(1);opacity:.65}
+      80%{opacity:0}
+      100%{transform:scale(1.6);opacity:0}
+    }
+    .float-label{
+      position:absolute;right:calc(100% + 10px);top:50%;
+      transform:translateY(-50%);
+      background:var(--bg2);border:1px solid var(--border);
+      color:var(--text);font-size:12px;font-weight:600;
+      padding:4px 10px;border-radius:6px;white-space:nowrap;
+      opacity:0;pointer-events:none;transition:opacity .15s;
+    }
+    .float-btn:hover .float-label{opacity:1}
+    .csub:disabled{opacity:.65;cursor:not-allowed;transform:none !important}
   </style>
 </head>
 <body>
@@ -672,7 +746,19 @@
     <li><a href="#contact">Liên hệ</a></li>
   </ul>
   <a href="tel:09099157678" class="nav-cta"><i data-lucide="phone" style="width:13px;height:13px;margin-right:5px"></i>0909 91 5678</a>
+  <button class="nav-hamburger" id="navHam" aria-label="Mở menu" aria-expanded="false" onclick="toggleDrawer()">
+    <span id="hamOpen"><i data-lucide="menu" style="width:20px;height:20px"></i></span>
+    <span id="hamClose" style="display:none"><i data-lucide="x" style="width:20px;height:20px"></i></span>
+  </button>
 </nav>
+
+<div class="nav-drawer" id="navDrawer">
+  <a href="#projects" onclick="closeDrawer()">Dự án</a>
+  <a href="#why" onclick="closeDrawer()">Về chúng tôi</a>
+  <a href="#banks" onclick="closeDrawer()">Ngân hàng</a>
+  <a href="#contact" onclick="closeDrawer()">Liên hệ</a>
+  <a href="tel:09099157678" class="d-cta"><i data-lucide="phone" style="width:14px;height:14px;margin-right:6px;vertical-align:middle"></i>0909 91 5678</a>
+</div>
 
 <!-- ══════════════════════════════
      HERO
@@ -924,13 +1010,13 @@
 
     <form class="cform r d1" onsubmit="doSubmit(event)">
       <div class="crow">
-        <div class="fg"><label>Họ và tên *</label><input type="text" placeholder="Nguyễn Văn A" required/></div>
-        <div class="fg"><label>Điện thoại *</label><input type="tel" placeholder="09xx xxx xxx" required/></div>
+        <div class="fg"><label>Họ và tên *</label><input type="text" name="name" placeholder="Nguyễn Văn A" required/></div>
+        <div class="fg"><label>Điện thoại *</label><input type="tel" name="phone" placeholder="09xx xxx xxx" required/></div>
       </div>
-      <div class="fg"><label>Email</label><input type="email" placeholder="email@example.com"/></div>
+      <div class="fg"><label>Email</label><input type="email" name="email" placeholder="email@example.com"/></div>
       <div class="fg">
         <label>Dự án quan tâm</label>
-        <select>
+        <select name="project">
           <option value="">— Chọn dự án —</option>
           <option>ONE ERA — Thượng Đông, TP.HCM</option>
           <option>Century City — Long Thành, Đồng Nai</option>
@@ -939,7 +1025,7 @@
           <option>Tất cả dự án</option>
         </select>
       </div>
-      <div class="fg"><label>Nhu cầu / ghi chú</label><textarea rows="3" placeholder="Tôi muốn tìm hiểu thêm về..."></textarea></div>
+      <div class="fg"><label>Nhu cầu / ghi chú</label><textarea rows="3" name="message" placeholder="Tôi muốn tìm hiểu thêm về..."></textarea></div>
       <button type="submit" class="csub">Gửi đăng ký tư vấn →</button>
       <p class="cnote">Thông tin bảo mật tuyệt đối. Phản hồi trong 30 phút.</p>
     </form>
@@ -1014,6 +1100,21 @@
 
 <div id="toast"><i data-lucide="check-circle" style="width:16px;height:16px;margin-right:7px;vertical-align:middle;color:#4ade80"></i>Đăng ký thành công! Chúng tôi sẽ liên hệ sớm.</div>
 
+<!-- FLOATING CTA -->
+<div class="float-cta" aria-label="Liên hệ nhanh">
+  <a href="https://zalo.me/0909915678" target="_blank" rel="noopener"
+     class="float-btn float-zalo" aria-label="Chat Zalo">
+    <span class="float-label">Chat Zalo</span>
+    <svg width="26" height="26" viewBox="0 0 26 26" fill="none" aria-hidden="true">
+      <text x="3" y="21" font-size="22" font-weight="900" fill="white" font-family="Arial,sans-serif">Z</text>
+    </svg>
+  </a>
+  <a href="tel:09099157678" class="float-btn float-phone" aria-label="Gọi ngay">
+    <span class="float-label">0909 91 5678</span>
+    <i data-lucide="phone" style="width:22px;height:22px"></i>
+  </a>
+</div>
+
 <script>
   /* Init Lucide icons */
   lucide.createIcons();
@@ -1034,19 +1135,46 @@
   );
   document.querySelectorAll('.r').forEach(el => io.observe(el));
 
-  /* Navbar background on scroll */
+  /* Navbar background on scroll + đóng drawer */
   window.addEventListener('scroll', () => {
     document.getElementById('nav').style.background =
       window.scrollY > 40 ? 'rgba(15,23,42,.98)' : 'rgba(15,23,42,.9)';
-  });
+    if (document.getElementById('navDrawer').classList.contains('open')) closeDrawer();
+  }, { passive: true });
 
-  /* Form */
-  function doSubmit(e) {
+  /* Form — gửi thực qua FormSubmit.co AJAX */
+  async function doSubmit(e) {
     e.preventDefault();
-    const t = document.getElementById('toast');
-    t.classList.add('show');
-    e.target.reset();
-    setTimeout(() => t.classList.remove('show'), 4000);
+    const btn = e.target.querySelector('.csub');
+    const orig = btn.textContent;
+    btn.textContent = 'Đang gửi…';
+    btn.disabled = true;
+    const fd = new FormData(e.target);
+    const payload = {
+      name:    fd.get('name'),
+      phone:   fd.get('phone'),
+      email:   fd.get('email')   || '(không điền)',
+      project: fd.get('project') || '(chưa chọn)',
+      message: fd.get('message') || '',
+      _subject: 'Đăng ký tư vấn BĐS — Kim Oanh Group',
+    };
+    try {
+      const res = await fetch('https://formsubmit.co/ajax/phuc.pham.vst@gmail.com', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      if (!res.ok) throw new Error();
+      const t = document.getElementById('toast');
+      t.classList.add('show');
+      e.target.reset();
+      setTimeout(() => t.classList.remove('show'), 4000);
+    } catch {
+      alert('Gửi thất bại. Vui lòng gọi hotline 0909 91 5678 hoặc thử lại.');
+    } finally {
+      btn.textContent = orig;
+      btn.disabled = false;
+    }
   }
 
   /* ══════════════════════════════
@@ -1588,8 +1716,23 @@
     }, 300);
   }
 
+  /* Mobile drawer */
+  function toggleDrawer() {
+    const drawer = document.getElementById('navDrawer');
+    const isOpen = drawer.classList.toggle('open');
+    document.getElementById('navHam').setAttribute('aria-expanded', isOpen);
+    document.getElementById('hamOpen').style.display  = isOpen ? 'none' : '';
+    document.getElementById('hamClose').style.display = isOpen ? ''     : 'none';
+  }
+  function closeDrawer() {
+    document.getElementById('navDrawer').classList.remove('open');
+    document.getElementById('navHam').setAttribute('aria-expanded', 'false');
+    document.getElementById('hamOpen').style.display  = '';
+    document.getElementById('hamClose').style.display = 'none';
+  }
+
   document.addEventListener('keydown', e => {
-    if (e.key === 'Escape') closeModal();
+    if (e.key === 'Escape') { closeModal(); closeDrawer(); }
   });
 
   document.querySelectorAll('.proj-card').forEach(card => {
