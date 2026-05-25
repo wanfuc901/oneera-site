@@ -280,7 +280,7 @@ module.exports = async function handler(req, res) {
   try {
     await transporter.sendMail({
       from: '"Kim Oanh Group CRM" <kimoanhservices@gmail.com>',
-      to:   'kimoanhservices@gmail.com',
+      to:   process.env.MAIL_TO || 'phuc.pham.vst@gmail.com',
       subject,
       html: buildHtml({ name, phone, email, project, message, timestamp }),
     });
