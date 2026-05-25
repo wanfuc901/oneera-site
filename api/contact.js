@@ -2,77 +2,232 @@ const nodemailer = require('nodemailer');
 
 /* ─── HTML email template ─────────────────────────────────────────────────── */
 function buildHtml({ name, phone, email, project, message, timestamp }) {
-  const projectBlock = project
-    ? `<div style="font-size:17px;font-weight:800;color:#0f172a;">${project}</div>`
-    : `<div style="font-size:14px;color:#94a3b8;font-style:italic;">Chưa chọn dự án cụ thể</div>`;
 
-  const messageBlock = message ? `
-    <!-- Message -->
-    <div style="font-size:11px;font-weight:700;color:#b8924a;text-transform:uppercase;
-                letter-spacing:1.5px;margin:28px 0 14px;">Nhu cầu / Ghi chú</div>
-    <table width="100%" cellpadding="0" cellspacing="0">
-      <tr>
-        <td style="background:#f8fafc;border:1px solid #e2e8f0;border-left:3px solid #C8A96E;
-                   border-radius:0 8px 8px 0;padding:14px 18px;">
-          <div style="font-size:14px;color:#334155;line-height:1.75;">${escHtml(message)}</div>
-        </td>
-      </tr>
-    </table>` : '';
+  const emailRow = email
+    ? `<a href="mailto:${escHtml(email)}" style="color:#1d4ed8;text-decoration:none;font-size:14px;">${escHtml(email)}</a>`
+    : `<span style="color:#94a3b8;font-size:14px;">—</span>`;
+
+  const projectRow = project
+    ? `<span style="font-size:15px;font-weight:700;color:#0f172a;">${escHtml(project)}</span>`
+    : `<span style="font-size:14px;color:#94a3b8;font-style:italic;">Chưa chọn dự án cụ thể</span>`;
+
+  const messageSection = message ? `
+        <!-- Divider -->
+        <tr><td height="1" style="background:#f1f5f9;font-size:0;line-height:0;" colspan="2">&nbsp;</td></tr>
+        <tr>
+          <td style="padding:14px 24px 6px;font-size:10px;font-weight:700;color:#94a3b8;
+                     text-transform:uppercase;letter-spacing:1.2px;" colspan="2">
+            Nhu cầu / Ghi chú
+          </td>
+        </tr>
+        <tr>
+          <td colspan="2" style="padding:0 24px 20px;">
+            <div style="background:#f8fafc;border-left:3px solid #C8A96E;
+                        padding:13px 16px;font-size:14px;color:#334155;line-height:1.75;
+                        border-radius:0 6px 6px 0;">
+              ${escHtml(message)}
+            </div>
+          </td>
+        </tr>` : '';
 
   return `<!DOCTYPE html>
 <html lang="vi">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Đăng ký tư vấn mới</title>
+  <title>Thông báo đăng ký tư vấn</title>
 </head>
-<body style="margin:0;padding:0;background:#eef2f7;
-             font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">
+<body style="margin:0;padding:0;background:#f1f5f9;
+             font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased;">
 
-<table width="100%" cellpadding="0" cellspacing="0"
-       style="background:#eef2f7;padding:36px 16px;">
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#f1f5f9;padding:40px 16px;">
 <tr><td align="center">
 
-  <!-- CARD -->
-  <table width="600" cellpadding="0" cellspacing="0"
-         style="max-width:600px;width:100%;border-radius:14px;
-                overflow:hidden;box-shadow:0 6px 32px rgba(0,0,0,.13);">
+  <table width="580" cellpadding="0" cellspacing="0"
+         style="max-width:580px;width:100%;">
 
-    <!-- TOP GOLD BAR -->
+    <!-- ── HEADER ────────────────────────────────────────── -->
     <tr>
-      <td style="background:linear-gradient(90deg,#8A6E3E,#C8A96E,#E8D4AA,#C8A96E,#8A6E3E);
-                 height:4px;font-size:0;line-height:0;">&nbsp;</td>
-    </tr>
+      <td style="background:#0f172a;border-radius:10px 10px 0 0;
+                 padding:0 0 0 0;overflow:hidden;">
 
-    <!-- HEADER -->
-    <tr>
-      <td style="background:linear-gradient(150deg,#0f172a 0%,#1a2640 60%,#0f172a 100%);
-                 padding:28px 36px 22px;">
+        <!-- Gold accent line -->
         <table width="100%" cellpadding="0" cellspacing="0">
           <tr>
-            <td style="vertical-align:middle;">
-              <div style="font-size:10px;color:#C8A96E;letter-spacing:3px;
-                          text-transform:uppercase;font-weight:700;margin-bottom:6px;">
-                Địa ốc
-              </div>
-              <div style="font-size:24px;font-weight:900;color:#C8A96E;
-                          letter-spacing:-0.5px;line-height:1;">
-                KIM OANH GROUP
-              </div>
-              <div style="font-size:11px;color:#7a8fa8;margin-top:5px;letter-spacing:.5px;">
-                Hệ thống tiếp nhận đăng ký tư vấn
-              </div>
-            </td>
-            <td align="right" style="vertical-align:middle;">
-              <table cellpadding="0" cellspacing="0">
+            <td style="background:#C8A96E;height:3px;font-size:0;line-height:0;">&nbsp;</td>
+          </tr>
+        </table>
+
+        <table width="100%" cellpadding="0" cellspacing="0">
+          <tr>
+            <td style="padding:26px 32px 24px;">
+              <table width="100%" cellpadding="0" cellspacing="0">
                 <tr>
-                  <td style="background:rgba(200,169,110,.12);
-                             border:1px solid rgba(200,169,110,.3);
-                             border-radius:8px;padding:10px 16px;text-align:right;">
-                    <div style="font-size:10px;color:#C8A96E;text-transform:uppercase;
-                                letter-spacing:1px;font-weight:700;">Thời gian nhận</div>
-                    <div style="font-size:12px;color:#cbd5e1;margin-top:4px;
-                                font-weight:600;">${timestamp}</div>
+                  <td style="vertical-align:top;">
+                    <div style="font-size:9px;color:#C8A96E;letter-spacing:3px;
+                                text-transform:uppercase;font-weight:700;margin-bottom:7px;">
+                      Địa ốc
+                    </div>
+                    <div style="font-size:22px;font-weight:800;color:#ffffff;
+                                letter-spacing:-0.3px;line-height:1.1;">
+                      Kim Oanh Group
+                    </div>
+                    <div style="font-size:12px;color:#64748b;margin-top:5px;
+                                font-weight:400;">
+                      Thông báo đăng ký tư vấn bất động sản
+                    </div>
+                  </td>
+                  <td align="right" style="vertical-align:top;">
+                    <div style="border:1px solid #1e3a5f;border-radius:6px;
+                                padding:9px 14px;text-align:right;display:inline-block;">
+                      <div style="font-size:9px;color:#475569;text-transform:uppercase;
+                                  letter-spacing:1px;font-weight:600;margin-bottom:4px;">
+                        Thời gian nhận
+                      </div>
+                      <div style="font-size:12px;color:#94a3b8;font-weight:500;">
+                        ${timestamp}
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+        </table>
+
+      </td>
+    </tr>
+
+    <!-- ── NOTICE BAR ─────────────────────────────────────── -->
+    <tr>
+      <td style="background:#fefce8;border-left:3px solid #C8A96E;
+                 border-right:3px solid #C8A96E;padding:12px 29px;">
+        <table width="100%" cellpadding="0" cellspacing="0"><tr>
+          <td>
+            <span style="font-size:13px;font-weight:600;color:#713f12;letter-spacing:.1px;">
+              Khách hàng mới vừa gửi yêu cầu tư vấn — vui lòng liên hệ lại trong 30 phút.
+            </span>
+          </td>
+        </tr></table>
+      </td>
+    </tr>
+
+    <!-- ── BODY ───────────────────────────────────────────── -->
+    <tr>
+      <td style="background:#ffffff;padding:0;">
+
+        <table width="100%" cellpadding="0" cellspacing="0">
+
+          <!-- Section label: Thông tin khách hàng -->
+          <tr>
+            <td colspan="2" style="padding:28px 32px 12px;">
+              <div style="font-size:9px;font-weight:700;color:#94a3b8;
+                          text-transform:uppercase;letter-spacing:1.5px;">
+                Thông tin khách hàng
+              </div>
+              <div style="height:1px;background:#f1f5f9;margin-top:10px;"></div>
+            </td>
+          </tr>
+
+          <!-- Họ tên -->
+          <tr>
+            <td width="140" style="padding:11px 16px 11px 32px;font-size:11px;
+                font-weight:600;color:#94a3b8;text-transform:uppercase;
+                letter-spacing:.5px;vertical-align:middle;">
+              Họ và tên
+            </td>
+            <td style="padding:11px 32px 11px 16px;font-size:16px;
+                font-weight:700;color:#0f172a;vertical-align:middle;">
+              ${escHtml(name)}
+            </td>
+          </tr>
+          <tr><td colspan="2" style="padding:0 32px;"><div style="height:1px;background:#f8fafc;"></div></td></tr>
+
+          <!-- Điện thoại -->
+          <tr>
+            <td style="padding:11px 16px 11px 32px;font-size:11px;
+                font-weight:600;color:#94a3b8;text-transform:uppercase;
+                letter-spacing:.5px;vertical-align:middle;">
+              Điện thoại
+            </td>
+            <td style="padding:11px 32px 11px 16px;vertical-align:middle;">
+              <a href="tel:${phone.replace(/\s/g,'')}"
+                 style="font-size:20px;font-weight:800;color:#b8924a;
+                        text-decoration:none;letter-spacing:.5px;">
+                ${escHtml(phone)}
+              </a>
+            </td>
+          </tr>
+          <tr><td colspan="2" style="padding:0 32px;"><div style="height:1px;background:#f8fafc;"></div></td></tr>
+
+          <!-- Email -->
+          <tr>
+            <td style="padding:11px 16px 11px 32px;font-size:11px;
+                font-weight:600;color:#94a3b8;text-transform:uppercase;
+                letter-spacing:.5px;vertical-align:middle;">
+              Email
+            </td>
+            <td style="padding:11px 32px 11px 16px;vertical-align:middle;">
+              ${emailRow}
+            </td>
+          </tr>
+
+          <!-- Section label: Dự án -->
+          <tr>
+            <td colspan="2" style="padding:28px 32px 12px;">
+              <div style="font-size:9px;font-weight:700;color:#94a3b8;
+                          text-transform:uppercase;letter-spacing:1.5px;">
+                Dự án quan tâm
+              </div>
+              <div style="height:1px;background:#f1f5f9;margin-top:10px;"></div>
+            </td>
+          </tr>
+
+          <tr>
+            <td colspan="2" style="padding:0 32px 24px;">
+              <table width="100%" cellpadding="0" cellspacing="0">
+                <tr>
+                  <td style="background:#fffbf2;border:1px solid #e8d4aa;
+                             border-radius:8px;padding:14px 18px;">
+                    ${projectRow}
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          ${messageSection}
+
+        </table>
+
+      </td>
+    </tr>
+
+    <!-- ── CTA ────────────────────────────────────────────── -->
+    <tr>
+      <td style="background:#ffffff;padding:0 32px 32px;">
+        <table width="100%" cellpadding="0" cellspacing="0">
+          <tr>
+            <td style="background:#f8fafc;border:1px solid #e2e8f0;
+                       border-radius:8px;padding:18px 24px;">
+              <table width="100%" cellpadding="0" cellspacing="0">
+                <tr>
+                  <td style="vertical-align:middle;">
+                    <div style="font-size:12px;color:#64748b;margin-bottom:3px;">
+                      Liên hệ khách hàng qua
+                    </div>
+                    <div style="font-size:15px;font-weight:700;color:#0f172a;">
+                      ${escHtml(phone)}
+                    </div>
+                  </td>
+                  <td align="right" style="vertical-align:middle;">
+                    <a href="tel:${phone.replace(/\s/g,'')}"
+                       style="display:inline-block;background:#0f172a;color:#C8A96E;
+                              font-size:13px;font-weight:700;padding:11px 24px;
+                              border-radius:7px;text-decoration:none;
+                              letter-spacing:.2px;white-space:nowrap;">
+                      Gọi ngay
+                    </a>
                   </td>
                 </tr>
               </table>
@@ -82,140 +237,25 @@ function buildHtml({ name, phone, email, project, message, timestamp }) {
       </td>
     </tr>
 
-    <!-- ALERT BANNER -->
+    <!-- ── FOOTER ─────────────────────────────────────────── -->
     <tr>
-      <td style="background:#C8A96E;padding:13px 36px;">
-        <table width="100%" cellpadding="0" cellspacing="0"><tr>
-          <td>
-            <span style="font-size:14px;font-weight:800;color:#0f172a;">
-              🔔&nbsp; Có khách hàng mới đăng ký — Liên hệ lại trong 30 phút!
-            </span>
-          </td>
-        </tr></table>
-      </td>
-    </tr>
-
-    <!-- BODY -->
-    <tr>
-      <td style="background:#ffffff;padding:32px 36px 36px;">
-
-        <!-- Section: Khách hàng -->
-        <div style="font-size:11px;font-weight:700;color:#b8924a;text-transform:uppercase;
-                    letter-spacing:1.5px;margin-bottom:14px;">
-          Thông tin khách hàng
-        </div>
-
-        <table width="100%" cellpadding="0" cellspacing="0"
-               style="border-radius:10px;overflow:hidden;
-                      border:1px solid #e2e8f0;">
-
-          <!-- Tên -->
-          <tr>
-            <td width="130" style="background:#f8fafc;padding:13px 16px;
-                border-right:1px solid #e2e8f0;border-bottom:1px solid #e2e8f0;
-                font-size:11px;font-weight:700;color:#94a3b8;
-                text-transform:uppercase;letter-spacing:.4px;vertical-align:middle;">
-              Họ và tên
-            </td>
-            <td style="background:#ffffff;padding:13px 18px;
-                border-bottom:1px solid #e2e8f0;
-                font-size:16px;font-weight:800;color:#0f172a;">
-              ${escHtml(name)}
-            </td>
-          </tr>
-
-          <!-- SĐT -->
-          <tr>
-            <td style="background:#f8fafc;padding:13px 16px;
-                border-right:1px solid #e2e8f0;border-bottom:1px solid #e2e8f0;
-                font-size:11px;font-weight:700;color:#94a3b8;
-                text-transform:uppercase;letter-spacing:.4px;vertical-align:middle;">
-              Điện thoại
-            </td>
-            <td style="background:#fffbf2;padding:13px 18px;
-                border-bottom:1px solid #e2e8f0;">
-              <a href="tel:${phone.replace(/\s/g,'')}"
-                 style="font-size:18px;font-weight:900;color:#C8A96E;
-                        text-decoration:none;letter-spacing:.5px;">
-                ${escHtml(phone)}
-              </a>
-            </td>
-          </tr>
-
-          <!-- Email -->
-          <tr>
-            <td style="background:#f8fafc;padding:13px 16px;
-                border-right:1px solid #e2e8f0;
-                font-size:11px;font-weight:700;color:#94a3b8;
-                text-transform:uppercase;letter-spacing:.4px;vertical-align:middle;">
-              Email
-            </td>
-            <td style="background:#ffffff;padding:13px 18px;
-                font-size:14px;color:#475569;">
-              ${email ? `<a href="mailto:${escHtml(email)}"
-                   style="color:#3b82f6;text-decoration:none;">${escHtml(email)}</a>` : '—'}
-            </td>
-          </tr>
-
-        </table>
-
-        <!-- Section: Dự án -->
-        <div style="font-size:11px;font-weight:700;color:#b8924a;text-transform:uppercase;
-                    letter-spacing:1.5px;margin:28px 0 14px;">
-          Dự án quan tâm
-        </div>
-
-        <table width="100%" cellpadding="0" cellspacing="0">
-          <tr>
-            <td style="background:linear-gradient(135deg,rgba(200,169,110,.07),
-                        rgba(200,169,110,.02));
-                       border:1px solid rgba(200,169,110,.28);
-                       border-radius:10px;padding:16px 20px;">
-              ${projectBlock}
-            </td>
-          </tr>
-        </table>
-
-        ${messageBlock}
-
-        <!-- CTA -->
-        <table width="100%" cellpadding="0" cellspacing="0"
-               style="margin-top:32px;">
-          <tr>
-            <td align="center">
-              <a href="tel:${phone.replace(/\s/g,'')}"
-                 style="display:inline-block;background:#0f172a;color:#C8A96E;
-                        font-size:14px;font-weight:800;padding:14px 32px;
-                        border-radius:10px;text-decoration:none;
-                        border:1.5px solid rgba(200,169,110,.35);
-                        letter-spacing:.3px;">
-                📞&nbsp; Gọi ngay — ${escHtml(phone)}
-              </a>
-            </td>
-          </tr>
-        </table>
-
-      </td>
-    </tr>
-
-    <!-- FOOTER -->
-    <tr>
-      <td style="background:#0f172a;padding:20px 36px;
-                 border-top:1px solid rgba(200,169,110,.15);">
+      <td style="background:#f8fafc;border:1px solid #e2e8f0;
+                 border-top:none;border-radius:0 0 10px 10px;
+                 padding:18px 32px;">
         <table width="100%" cellpadding="0" cellspacing="0">
           <tr>
             <td style="vertical-align:middle;">
-              <div style="font-size:13px;font-weight:800;color:#C8A96E;
-                          margin-bottom:5px;">Kim Oanh Group</div>
-              <div style="font-size:11px;color:#7a8fa8;line-height:1.8;">
-                Hotline: 0909 91 5678 · 0907 839 986<br>
-                kimoanhservices@gmail.com
+              <div style="font-size:12px;font-weight:700;color:#334155;margin-bottom:3px;">
+                Kim Oanh Group
+              </div>
+              <div style="font-size:11px;color:#94a3b8;line-height:1.8;">
+                0909 91 5678 &nbsp;·&nbsp; 0907 839 986 &nbsp;·&nbsp; kimoanhservices@gmail.com
               </div>
             </td>
             <td align="right" style="vertical-align:middle;">
-              <div style="font-size:10px;color:#475569;line-height:1.6;text-align:right;">
-                Email tự động — đừng reply<br>
-                Kim Oanh CRM v1.0
+              <div style="font-size:10px;color:#cbd5e1;text-align:right;line-height:1.7;">
+                Email tự động, vui lòng không phản hồi.<br>
+                Kim Oanh CRM
               </div>
             </td>
           </tr>
@@ -223,11 +263,8 @@ function buildHtml({ name, phone, email, project, message, timestamp }) {
       </td>
     </tr>
 
-    <!-- BOTTOM GOLD BAR -->
-    <tr>
-      <td style="background:linear-gradient(90deg,#8A6E3E,#C8A96E,#E8D4AA,#C8A96E,#8A6E3E);
-                 height:3px;font-size:0;line-height:0;">&nbsp;</td>
-    </tr>
+    <!-- ── OUTER SPACER ───────────────────────────────────── -->
+    <tr><td height="32" style="font-size:0;line-height:0;">&nbsp;</td></tr>
 
   </table>
 
@@ -275,7 +312,7 @@ module.exports = async function handler(req, res) {
     },
   });
 
-  const subject = `🏠 [KH MỚI] ${name} — ${project || 'Chưa chọn dự án'} — ${phone}`;
+  const subject = `[Lead mới] ${name} · ${project || 'Chưa chọn dự án'} · ${phone}`;
 
   try {
     await transporter.sendMail({
