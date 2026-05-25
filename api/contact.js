@@ -1,4 +1,45 @@
-const nodemailer = require('nodemailer');
+const nodemailer  = require('nodemailer');
+const { google }  = require('googleapis');
+
+/* ─── Google Sheets — append one row ─────────────────────────────────────── */
+async function appendToSheet({ timestamp, name, phone, email, project, message }) {
+  const auth = new google.auth.GoogleAuth({
+    credentials: {
+      client_email: process.env.GOOGLE_CLIENT_EMAIL,
+      private_key:  (process.env.GOOGLE_PRIVATE_KEY || '').replace(/\\n/g, '\n'),
+    },
+    scopes: ['https://www.googleapis.com/auth/spreadsheets'],
+  });
+
+  const sheets        = google.sheets({ version: 'v4', auth });
+  const spreadsheetId = process.env.GOOGLE_SHEET_ID;
+  const RANGE         = 'Sheet1!A:F';
+  const HEADERS       = ['Thời gian', 'Họ và tên', 'Điện thoại', 'Email', 'Dự án quan tâm', 'Ghi chú'];
+
+  /* tạo header nếu sheet còn trống */
+  const { data } = await sheets.spreadsheets.values.get({
+    spreadsheetId,
+    range: 'Sheet1!A1',
+  });
+  if (!data.values || data.values.length === 0) {
+    await sheets.spreadsheets.values.update({
+      spreadsheetId,
+      range:            'Sheet1!A1',
+      valueInputOption: 'RAW',
+      requestBody:      { values: [HEADERS] },
+    });
+  }
+
+  await sheets.spreadsheets.values.append({
+    spreadsheetId,
+    range:            RANGE,
+    valueInputOption: 'RAW',
+    insertDataOption: 'INSERT_ROWS',
+    requestBody: {
+      values: [[timestamp, name, phone, email || '', project || '', message || '']],
+    },
+  });
+}
 
 /* ─── HTML email template ─────────────────────────────────────────────────── */
 function buildHtml({ name, phone, email, project, message, timestamp }) {
@@ -314,16 +355,25 @@ module.exports = async function handler(req, res) {
 
   const subject = `[Lead mới] ${name} · ${project || 'Chưa chọn dự án'} · ${phone}`;
 
-  try {
-    await transporter.sendMail({
-      from: '"Kim Oanh Group CRM" <kimoanhservices@gmail.com>',
-      to:   process.env.MAIL_TO || 'phuc.pham.vst@gmail.com',
+  const data = { name, phone, email, project, message, timestamp };
+
+  const [mailResult, sheetResult] = await Promise.allSettled([
+    transporter.sendMail({
+      from:    '"Kim Oanh Group CRM" <kimoanhservices@gmail.com>',
+      to:      process.env.MAIL_TO || 'phuc.pham.vst@gmail.com',
       subject,
-      html: buildHtml({ name, phone, email, project, message, timestamp }),
-    });
-    return res.status(200).json({ success: true });
-  } catch (err) {
-    console.error('[contact] Gmail error:', err.message);
+      html:    buildHtml(data),
+    }),
+    appendToSheet(data),
+  ]);
+
+  if (mailResult.status === 'rejected') {
+    console.error('[contact] Gmail error:', mailResult.reason?.message);
     return res.status(500).json({ error: 'Gửi email thất bại' });
   }
+  if (sheetResult.status === 'rejected') {
+    console.error('[contact] Sheets error:', sheetResult.reason?.message);
+  }
+
+  return res.status(200).json({ success: true });
 };
