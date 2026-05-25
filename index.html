@@ -1143,7 +1143,7 @@
     if (document.getElementById('navDrawer').classList.contains('open')) closeDrawer();
   }, { passive: true });
 
-  /* Form — gửi thực qua FormSubmit.co AJAX */
+  /* Form — gửi qua /api/contact (Gmail SMTP) */
   async function doSubmit(e) {
     e.preventDefault();
     const btn = e.target.querySelector('.csub');
@@ -1154,16 +1154,15 @@
     const payload = {
       name:    fd.get('name'),
       phone:   fd.get('phone'),
-      email:   fd.get('email')   || '(không điền)',
-      project: fd.get('project') || '(chưa chọn)',
+      email:   fd.get('email')   || '',
+      project: fd.get('project') || '',
       message: fd.get('message') || '',
-      _subject: 'Đăng ký tư vấn BĐS — Kim Oanh Group',
     };
     try {
-      const res = await fetch('https://formsubmit.co/ajax/phuc.pham.vst@gmail.com', {
+      const res = await fetch('/api/contact', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-        body: JSON.stringify(payload)
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
       });
       if (!res.ok) throw new Error();
       const t = document.getElementById('toast');
