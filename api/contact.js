@@ -14,28 +14,27 @@ async function appendToSheet({ timestamp, name, phone, email, project, message }
 
   const sheets        = google.sheets({ version: 'v4', auth });
   const spreadsheetId = process.env.GOOGLE_SHEET_ID;
-  const RANGE         = 'Sheet1!A:F';
   const HEADERS       = ['Thời gian', 'Họ và tên', 'Điện thoại', 'Email', 'Dự án quan tâm', 'Ghi chú'];
 
+  /* lấy tên sheet đầu tiên — không hardcode "Sheet1" */
+  const meta      = await sheets.spreadsheets.get({ spreadsheetId });
+  const sheetName = meta.data.sheets[0].properties.title;
+  const R1        = `${sheetName}!A1`;
+  const RANGE     = `${sheetName}!A:F`;
+
   /* tạo header nếu sheet còn trống */
-  const { data } = await sheets.spreadsheets.values.get({
-    spreadsheetId,
-    range: 'Sheet1!A1',
-  });
+  const { data } = await sheets.spreadsheets.values.get({ spreadsheetId, range: R1 });
   if (!data.values || data.values.length === 0) {
     await sheets.spreadsheets.values.update({
       spreadsheetId,
-      range:            'Sheet1!A1',
-      valueInputOption: 'RAW',
-      requestBody:      { values: [HEADERS] },
+      range: R1, valueInputOption: 'RAW',
+      requestBody: { values: [HEADERS] },
     });
   }
 
   await sheets.spreadsheets.values.append({
     spreadsheetId,
-    range:            RANGE,
-    valueInputOption: 'RAW',
-    insertDataOption: 'INSERT_ROWS',
+    range: RANGE, valueInputOption: 'RAW', insertDataOption: 'INSERT_ROWS',
     requestBody: {
       values: [[timestamp, name, phone, email || '', project || '', message || '']],
     },
