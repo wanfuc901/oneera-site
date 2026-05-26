@@ -3,7 +3,10 @@ const { google }  = require('googleapis');
 
 /* ─── Google Sheets — append one row ─────────────────────────────────────── */
 async function appendToSheet({ timestamp, name, phone, email, project, message }) {
-  const sa   = JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT);
+  const raw = process.env.GOOGLE_SERVICE_ACCOUNT;
+  if (!raw) throw new Error('GOOGLE_SERVICE_ACCOUNT env var not set');
+  let sa;
+  try { sa = JSON.parse(raw); } catch { throw new Error('GOOGLE_SERVICE_ACCOUNT is not valid JSON'); }
   const auth = new google.auth.GoogleAuth({
     credentials: {
       client_email: sa.client_email,
@@ -192,7 +195,7 @@ function buildHtml({ name, phone, email, project, message, timestamp, sheetUrl }
               Điện thoại
             </td>
             <td style="padding:11px 32px 11px 16px;vertical-align:middle;">
-              <a href="tel:${phone.replace(/\s/g,'')}"
+              <a href="tel:${escHtml(phone.replace(/[^\d\+]/g,''))}"
                  style="font-size:20px;font-weight:800;color:#b8924a;
                         text-decoration:none;letter-spacing:.5px;">
                 ${escHtml(phone)}
@@ -325,19 +328,39 @@ function escHtml(str) {
     .replace(/"/g, '&quot;');
 }
 
+/* ─── Validation ──────────────────────────────────────────────────────────── */
+const ALLOWED_ORIGIN = process.env.ALLOWED_ORIGIN || 'https://dia-oc-kim-oanh.vercel.app';
+const PHONE_RE       = /^[0-9\s\-\+\(\)]{7,20}$/;
+const EMAIL_RE       = /^[^\s@]{1,64}@[^\s@]{1,255}$/;
+
+function sanitizeStr(val, maxLen) {
+  if (val == null) return '';
+  return String(val).trim().slice(0, maxLen);
+}
+
 /* ─── Handler ─────────────────────────────────────────────────────────────── */
 module.exports = async function handler(req, res) {
-  res.setHeader('Access-Control-Allow-Origin', '*');
+  const origin = req.headers.origin || '';
+  const allowedOrigin = origin === ALLOWED_ORIGIN ? origin : ALLOWED_ORIGIN;
+  res.setHeader('Access-Control-Allow-Origin', allowedOrigin);
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  res.setHeader('Vary', 'Origin');
 
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST')   return res.status(405).json({ error: 'Method not allowed' });
 
-  const { name, phone, email, project, message } = req.body || {};
-  if (!name || !phone) {
-    return res.status(400).json({ error: 'Thiếu thông tin bắt buộc (name, phone)' });
-  }
+  const body = req.body || {};
+  const name    = sanitizeStr(body.name,    120);
+  const phone   = sanitizeStr(body.phone,    30);
+  const email   = sanitizeStr(body.email,   200);
+  const project = sanitizeStr(body.project,  80);
+  const message = sanitizeStr(body.message, 800);
+
+  if (!name)  return res.status(400).json({ error: 'Thiếu họ tên' });
+  if (!phone) return res.status(400).json({ error: 'Thiếu số điện thoại' });
+  if (!PHONE_RE.test(phone))           return res.status(400).json({ error: 'Số điện thoại không hợp lệ' });
+  if (email && !EMAIL_RE.test(email))  return res.status(400).json({ error: 'Email không hợp lệ' });
 
   const timestamp = new Date().toLocaleString('vi-VN', {
     timeZone: 'Asia/Ho_Chi_Minh',
