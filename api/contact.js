@@ -328,6 +328,20 @@ function escHtml(str) {
     .replace(/"/g, '&quot;');
 }
 
+/* ─── Rate limiting (in-memory, per IP, resets on cold start) ─────────────── */
+const rateMap = new Map();
+const RATE_WINDOW_MS  = 60_000;
+const RATE_MAX_REQ    = 5;
+
+function isRateLimited(ip) {
+  const now  = Date.now();
+  const entry = rateMap.get(ip) || { count: 0, start: now };
+  if (now - entry.start > RATE_WINDOW_MS) { entry.count = 0; entry.start = now; }
+  entry.count++;
+  rateMap.set(ip, entry);
+  return entry.count > RATE_MAX_REQ;
+}
+
 /* ─── Validation ──────────────────────────────────────────────────────────── */
 const ALLOWED_ORIGIN = process.env.ALLOWED_ORIGIN || 'https://dia-oc-kim-oanh.vercel.app';
 const PHONE_RE       = /^[0-9\s\-\+\(\)]{7,20}$/;
@@ -349,6 +363,11 @@ module.exports = async function handler(req, res) {
 
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST')   return res.status(405).json({ error: 'Method not allowed' });
+
+  const clientIp = req.headers['x-forwarded-for']?.split(',')[0].trim() || req.socket?.remoteAddress || 'unknown';
+  if (isRateLimited(clientIp)) {
+    return res.status(429).json({ error: 'Quá nhiều yêu cầu. Vui lòng thử lại sau 1 phút.' });
+  }
 
   const body = req.body || {};
   const name    = sanitizeStr(body.name,    120);

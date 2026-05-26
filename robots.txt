@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://dia-oc-kim-oanh.vercel.app/sitemap.xml

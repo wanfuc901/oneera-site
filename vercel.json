@@ -2,7 +2,7 @@
   "cleanUrls": true,
   "trailingSlash": false,
   "rewrites": [
-    { "source": "/((?!assets|fonts|img|favicon\\.png|og-image\\.jpg|site\\.webmanifest).*)", "destination": "/index.html" }
+    { "source": "/((?!assets|fonts|img|favicon\\.png|og-image\\.jpg|site\\.webmanifest|robots\\.txt|sitemap\\.xml).*)", "destination": "/index.html" }
   ],
   "headers": [
     {

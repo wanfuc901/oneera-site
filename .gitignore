@@ -12,3 +12,6 @@ Thumbs.db
 *~
 
 .vercel
+
+# Image originals backup (local only)
+img/originals/
